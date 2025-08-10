@@ -89,9 +89,9 @@ else
   VERIFY_CHECKSUM
 fi
 
-# 7. Resize the image by +50G
-echo -e "${YELLOW}[+] Resizing image '$IMG_NAME' by +50G...${NC}"
-qemu-img resize "$IMG_NAME" +50G
+# 7. Resize the image by +20G
+echo -e "${YELLOW}[+] Resizing image '$IMG_NAME' by +20G...${NC}"
+qemu-img resize "$IMG_NAME" +20G
 
 # 8. Show absolute path to use in Terraform variables
 ABSOLUTE_PATH=$(readlink -f "$IMG_NAME")
