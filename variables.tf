@@ -33,7 +33,7 @@ variable "vms" {
       vcpu        = 2
     },
     "vm4" = {
-      vm_hostname = "vm1"
+      vm_hostname = "vm4"
       memory      = 2048
       vcpu        = 2
     }
