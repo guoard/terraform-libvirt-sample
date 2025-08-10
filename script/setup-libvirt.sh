@@ -51,10 +51,10 @@ USER_NAME=$(whoami)
 echo -e "${YELLOW}[+] Adding user '$USER_NAME' to 'libvirt' group...${NC}"
 sudo usermod -aG libvirt "$USER_NAME"
 
-# 6. Download Ubuntu Cloud image if not already downloaded or if corrupted
-IMG_NAME="jammy-server-cloudimg-amd64.img"
-IMG_URL="https://cloud-images.ubuntu.com/jammy/current/$IMG_NAME"
-SHA256SUM_URL="https://cloud-images.ubuntu.com/jammy/current/SHA256SUMS"
+# 6. Download Debian Cloud image if not already downloaded or if corrupted
+IMG_NAME="debian-12-genericcloud-amd64-daily.qcow2"
+IMG_URL="https://cloud.debian.org/images/cloud/bookworm/daily/latest/$IMG_NAME"
+SHA256SUM_URL="https://cloud.debian.org/images/cloud/bookworm/daily/latest/SHA512SUMS"
 
 DOWNLOAD_IMAGE() {
   echo -e "${YELLOW}[+] Downloading Ubuntu image...${NC}"
@@ -63,14 +63,14 @@ DOWNLOAD_IMAGE() {
 
 VERIFY_CHECKSUM() {
   echo -e "${YELLOW}[+] Verifying checksum...${NC}"
-  wget -O SHA256SUMS "$SHA256SUM_URL"
-  if sha256sum -c --ignore-missing SHA256SUMS; then
+  wget -O SHA512SUMS "$SHA256SUM_URL"
+  if sha512sum -c --ignore-missing SHA512SUMS; then
     echo -e "${YELLOW}[+] Checksum verification successful.${NC}"
-    rm -f SHA256SUMS
+    rm -f SHA512SUMS
     return 0
   else
     echo -e "${YELLOW}[!] Checksum verification failed.${NC}"
-    rm -f SHA256SUMS
+    rm -f SHA512SUMS
     return 1
   fi
 }
