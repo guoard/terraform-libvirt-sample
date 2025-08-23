@@ -15,27 +15,32 @@ variable "vms" {
     vm_hostname = string
     memory      = number
     vcpu        = number
+    ip_address  = string
   }))
   default = {
     "vm1" = {
       vm_hostname = "vm1"
       memory      = 2048
       vcpu        = 2
+      ip_address = "192.168.122.101"
     },
     "vm2" = {
       vm_hostname = "vm2"
       memory      = 2048
       vcpu        = 2
+      ip_address = "192.168.122.102"
     },
     "vm3" = {
       vm_hostname = "vm3"
       memory      = 2048
       vcpu        = 2
+      ip_address = "192.168.122.103"
     },
     "vm4" = {
-      vm_hostname = "vm1"
+      vm_hostname = "vm4"
       memory      = 2048
       vcpu        = 2
+      ip_address = "192.168.122.104"
     }
   }
 }

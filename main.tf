@@ -2,14 +2,6 @@ provider "libvirt" {
   uri = "qemu:///system"
 }
 
-data "template_file" "user_data" {
-  template = file("${path.module}/config/cloud_init.cfg")
-}
-
-data "template_file" "network_config" {
-  template = file("${path.module}/config/network_config.yml")
-}
-
 # Create a disk for each VM
 resource "libvirt_volume" "ubuntu_qcow2" {
   for_each = var.vms
@@ -25,8 +17,12 @@ resource "libvirt_cloudinit_disk" "commoninit" {
   for_each = var.vms
 
   name           = "${each.key}-commoninit.iso"
-  user_data      = data.template_file.user_data.rendered
-  network_config = data.template_file.network_config.rendered
+  user_data      = templatefile("${path.module}/config/cloud_init.cfg", {
+    hostname = each.value.vm_hostname
+  })
+  network_config = templatefile("${path.module}/config/network_config.yml", {
+    ip_address = each.value.ip_address
+  })
 }
 
 # Create a VM (domain) for each VM configuration
