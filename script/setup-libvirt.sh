@@ -21,37 +21,12 @@ echo -e "${YELLOW}[+] Installing prerequisites...${NC}"
 sudo apt update
 sudo apt install -y qemu-kvm libvirt-daemon-system virt-manager
 
-# 2. Create and start the default storage pool if it doesn't exist
-POOL_NAME="default"
-POOL_PATH="/var/lib/libvirt/images/default"
-
-echo -e "${YELLOW}[+] Checking if storage pool '$POOL_NAME' exists...${NC}"
-if ! virsh pool-list --all | grep -q "$POOL_NAME"; then
-  echo -e "${YELLOW}[+] Creating storage pool '$POOL_NAME' at $POOL_PATH...${NC}"
-  sudo mkdir -p "$POOL_PATH"
-  virsh pool-define-as "$POOL_NAME" dir - - - - "$POOL_PATH"
-  virsh pool-build "$POOL_NAME"
-  virsh pool-start "$POOL_NAME"
-  virsh pool-autostart "$POOL_NAME"
-else
-  echo -e "${YELLOW}[+] Storage pool '$POOL_NAME' already exists.${NC}"
-fi
-
-# 3. Set proper permissions for the storage pool path
-echo -e "${YELLOW}[+] Setting permissions for $POOL_PATH...${NC}"
-sudo chown libvirt-qemu:libvirt-qemu "$POOL_PATH"
-sudo chmod 755 "$POOL_PATH"
-
-# 4. Restart libvirtd service
-echo -e "${YELLOW}[+] Restarting libvirtd service...${NC}"
-sudo systemctl restart libvirtd
-
-# 5. Add current user to the libvirt group
+# 2. Add current user to the libvirt group
 USER_NAME=$(whoami)
 echo -e "${YELLOW}[+] Adding user '$USER_NAME' to 'libvirt' group...${NC}"
 sudo usermod -aG libvirt "$USER_NAME"
 
-# 6. Download Debian Cloud image if not already downloaded or if corrupted
+# 3. Download Debian Cloud image if not already downloaded or if corrupted
 IMG_NAME="debian-12-genericcloud-amd64-daily.qcow2"
 IMG_URL="https://cloud.debian.org/images/cloud/bookworm/daily/latest/$IMG_NAME"
 SHA256SUM_URL="https://cloud.debian.org/images/cloud/bookworm/daily/latest/SHA512SUMS"
@@ -89,7 +64,7 @@ else
   VERIFY_CHECKSUM
 fi
 
-# 7. Resize the image by +20G
+# 4. Resize the image by +20G
 echo -e "${YELLOW}[+] Resizing image '$IMG_NAME' by +20G...${NC}"
 qemu-img resize "$IMG_NAME" +20G
 
@@ -98,7 +73,7 @@ ABSOLUTE_PATH=$(readlink -f "$IMG_NAME")
 echo -e "${YELLOW}[+] Use this absolute path in your Terraform 'variables.tf':${NC}"
 echo "  $ABSOLUTE_PATH"
 
-# 9. Ask user if they want to automatically update variables.tf
+# 5. Ask user if they want to automatically update variables.tf
 echo -e "${YELLOW}[?] Do you want to automatically update 'variables.tf' with this path? (y/N):${NC}"
 read -r response
 if [[ "$response" =~ ^[Yy]$ ]]; then
@@ -106,7 +81,7 @@ if [[ "$response" =~ ^[Yy]$ ]]; then
   # Create a backup of the original file
   cp variables.tf variables.tf.backup
   # Update the default value in variables.tf
-  sed -i "s|default     = \".*\"|default     = \"$ABSOLUTE_PATH\"|" variables.tf
+  sed -i "s|default = \".*\"|default = \"$ABSOLUTE_PATH\"|" variables.tf
   echo -e "${YELLOW}[+] Updated variables.tf with the absolute path.${NC}"
   echo -e "${YELLOW}[+] Original file backed up as variables.tf.backup${NC}"
 else
