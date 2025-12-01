@@ -18,13 +18,13 @@ variable "vms" {
       ip_address = "192.168.122.101"
     },
     "vm2" = {
-      vm_hostname = "vm2"
+      hostname = "vm2"
       memory      = 4096
       vcpu        = 2
       ip_address  = "192.168.122.102"
     },
     "vm3" = {
-      vm_hostname = "vm3"
+      hostname = "vm3"
       memory      = 4096
       vcpu        = 2
       ip_address  = "192.168.122.103"
