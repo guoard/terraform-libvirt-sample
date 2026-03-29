@@ -136,12 +136,6 @@ resource "libvirt_domain" "domain_debian" {
             network = "default"
           }
         }
-        # TODO: wait_for_ip not implemented yet (Phase 2)
-        # This will wait during creation until the interface gets an IP
-        # wait_for_ip = {
-        #   timeout = 300    # seconds, default 300
-        #   source  = "any"  # "lease" (DHCP), "agent" (qemu-guest-agent), or "any" (try both)
-        # }
       }
     ]
 
@@ -166,9 +160,12 @@ resource "libvirt_domain" "domain_debian" {
   running = true
 }
 
-data "libvirt_domain_interface_addresses" "debian" {
-  for_each = var.vms
+output "instructions" {
+  value = <<-EOF
 
-  domain = libvirt_domain.domain_debian[each.key].name
-  source = "lease" # optional: "lease" (DHCP), "agent" (qemu-guest-agent), or "any"
+    Virtual machines have been created!
+
+    Note: It may take 30-60 seconds after boot for cloud-init to complete
+          and the SSH server to be available.
+  EOF
 }
