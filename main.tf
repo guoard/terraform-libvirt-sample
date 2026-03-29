@@ -87,6 +87,12 @@ resource "libvirt_domain" "domain_debian" {
     type = "hvm"
   }
 
+  features = {
+    acpi = true
+    apic = {}
+    pae  = true
+  }
+
   devices = {
     disks = [
       {
