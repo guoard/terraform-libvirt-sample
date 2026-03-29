@@ -21,7 +21,8 @@ resource "libvirt_volume" "debian_disk" {
 
   name   = "${each.key}.qcow2"
   pool   = libvirt_pool.pool.name
-  format = "qcow2"
+  #https://github.com/dmacvicar/terraform-provider-libvirt/issues/1238
+  #target = { format = { type = "qcow2" } }
 
   create = {
     content = {
@@ -55,7 +56,11 @@ resource "libvirt_volume" "debian_seed_volume" {
 
   name   = "${each.key}-cloudinit.iso"
   pool   = libvirt_pool.pool.name
-  format = "iso"
+  target = {
+    format = {
+      type = "iso"
+    }
+  }
 
   create = {
     content = {
@@ -70,25 +75,29 @@ resource "libvirt_domain" "domain_debian" {
 
   name   = each.value.hostname
   memory = each.value.memory
-  unit   = "MiB"
+  memory_unit   = "MiB"
   vcpu   = each.value.vcpu
+  type   = "kvm"
+
+  cpu = {
+    mode = "host-passthrough"
+  }
 
   os = {
     type = "hvm"
   }
 
-  features = {
-    acpi = true
-    apic = true
-    pae  = true
-  }
-
   devices = {
     disks = [
       {
+        driver = {
+          type = "qcow2"
+        }
         source = {
-          pool   = libvirt_volume.debian_disk[each.key].pool
-          volume = libvirt_volume.debian_disk[each.key].name
+          volume = {
+            pool   = libvirt_volume.debian_disk[each.key].pool
+            volume = libvirt_volume.debian_disk[each.key].name
+          }
         }
         target = {
           dev = "vda"
@@ -98,8 +107,10 @@ resource "libvirt_domain" "domain_debian" {
       {
         device = "cdrom"
         source = {
-          pool   = libvirt_volume.debian_seed_volume[each.key].pool
-          volume = libvirt_volume.debian_seed_volume[each.key].name
+          volume = {
+            pool   = libvirt_volume.debian_seed_volume[each.key].pool
+            volume = libvirt_volume.debian_seed_volume[each.key].name
+          }
         }
         target = {
           dev = "hda"
@@ -111,9 +122,13 @@ resource "libvirt_domain" "domain_debian" {
     interfaces = [
       {
         type  = "network"
-        model = "virtio"
+        model = {
+          type = "virtio"
+        }
         source = {
-          network = "default"
+          network = {
+            network = "default"
+          }
         }
         # TODO: wait_for_ip not implemented yet (Phase 2)
         # This will wait during creation until the interface gets an IP
@@ -126,23 +141,20 @@ resource "libvirt_domain" "domain_debian" {
 
     consoles = [
       {
-        target_port = 0
-        target_type = "serial"
-        type        = "pty"
-      },
-      {
-        target_port = 1
-        target_type = "virtio"
-        type        = "pty"
+          target_port = 0
+          target_type = "serial"
+          type        = "pty"
       }
     ]
 
-    graphics = {
-      spice = {
-        autoport = "yes"
-        listen   = "127.0.0.1"
+    graphics = [
+      {
+        vnc = {
+          auto_port = true
+          listen    = "127.0.0.1"
+        }
       }
-    }
+    ]
   }
 
   running = true
