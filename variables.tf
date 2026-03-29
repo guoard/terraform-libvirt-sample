@@ -1,5 +1,5 @@
 variable "debian_12_qcow_path" {
-  default = "/home/ali/w/terraform-libvirt-sample/debian-12-genericcloud-amd64-daily.qcow2"
+  default = "/home/ali/w/terraform-libvirt-sample/debian-13-genericcloud-amd64.qcow2"
 }
 
 variable "vms" {

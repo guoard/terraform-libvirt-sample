@@ -14,3 +14,8 @@ ssh:
 ssh_authorized_keys:
   - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAZaSJsvY2PjmLaIkqzzGmBLoxUyeXgS9jQKTCOY9SrP
 timezone: Asia/Tehran
+
+runcmd:
+  - systemctl disable --now systemd-resolved
+  - rm -f /etc/resolv.conf
+  - printf "nameserver 8.8.8.8\nnameserver 4.2.2.4\n" > /etc/resolv.conf
