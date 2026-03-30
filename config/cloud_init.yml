@@ -2,17 +2,12 @@
 hostname: ${hostname}
 fqdn: ${hostname}.local
 manage_etc_hosts: localhost
-ssh_pwauth: True
-chpasswd:
-  list: |
-    root:password
-  expire: False
-disable_root: False
-ssh:
-  permit_root_login: true
-  password_authentication: true
-ssh_authorized_keys:
-  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAZaSJsvY2PjmLaIkqzzGmBLoxUyeXgS9jQKTCOY9SrP
+users:
+  - name: root
+    lock_passwd: false
+    plain_text_passwd: password
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAZaSJsvY2PjmLaIkqzzGmBLoxUyeXgS9jQKTCOY9SrP
 timezone: Asia/Tehran
 
 runcmd:
