@@ -136,6 +136,27 @@ resource "libvirt_domain" "domain_debian" {
             network = "default"
           }
         }
+
+        # Static IP: no DHCP lease, so only the guest agent can report the address.
+        wait_for_ip = {
+          source  = "agent"
+          network = "${each.value.ip_address}/32"
+          timeout = 300
+        }
+      }
+    ]
+
+    # virtio-serial channel between libvirt and the QEMU guest agent.
+    channels = [
+      {
+        source = {
+          unix = {}
+        }
+        target = {
+          virt_io = {
+            name = "org.qemu.guest_agent.0"
+          }
+        }
       }
     ]
 
@@ -160,12 +181,9 @@ resource "libvirt_domain" "domain_debian" {
   running = true
 }
 
-output "instructions" {
-  value = <<-EOF
-
-    Virtual machines have been created!
-
-    Note: It may take 30-60 seconds after boot for cloud-init to complete
-          and the SSH server to be available.
-  EOF
+output "vms" {
+  description = "Name and IP address of each VM."
+  value = {
+    for key, domain in libvirt_domain.domain_debian : domain.name => var.vms[key].ip_address
+  }
 }

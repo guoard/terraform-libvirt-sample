@@ -91,8 +91,8 @@ terraform apply -auto-approve
 ### 6. Modify Cloud-Init Configuration
 To customize your VM’s initialization process, update the Cloud-Init configuration according to your needs. Modify user-data and meta-data files accordingly.
 
-### ⚠️⚠️ Static IP Issue ⚠️⚠️
-If you configure a static IP for the VM, Terraform will not terminate successfully and will keep retrying endlessly. However, this is expected behavior, and you can safely interrupt the process and SSH into the server manually without issues.
+### Static IP and `wait_for_ip`
+Each VM has a static IP. There is no DHCP lease, so libvirt cannot get the IP from the DHCP server. The QEMU guest agent reports the IP instead. Cloud-init installs the agent in the VM, and `main.tf` adds a guest agent channel to the domain. Terraform waits until the agent reports the configured IP (`wait_for_ip` in `main.tf`). If the VM cannot install packages, the wait stops after the timeout and `terraform apply` fails.
 
 ###  Destroy the VM 
 If you need to remove the VM, use:
